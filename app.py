@@ -23,13 +23,12 @@ def api():
     endpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions'
     payload = {
         'prompt': 'What is the name of the french president ?',
-        'temperature': 0.5,
         'max_tokens': 100
     }
     response = requests.post(endpoint, json=payload, headers=headers)
     # Get the answer from the response
-    answer = response.json()
-    return jsonify(answer)
+    answer = response.json()['choices'][0]['text']
+    return answer
 
 
 if __name__ == '__main__':
