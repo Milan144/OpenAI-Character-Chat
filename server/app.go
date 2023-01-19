@@ -30,7 +30,7 @@ func main() {
       fmt.Fprintf(w, "GET a game by id")
     })
     // POST add a new game
-    http.HandleFunc("/games", func(w http.ResponseWriter, r *http.Request) {
+    http.HandleFunc("/games/add", func(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "POST add a new game")
     })
 
@@ -45,7 +45,7 @@ func main() {
       fmt.Fprintf(w, "GET a character by id")
     })
     // POST add a new character 
-    http.HandleFunc("/characters", func(w http.ResponseWriter, r *http.Request) {
+    http.HandleFunc("/characters/add", func(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "POST add a new character")
     })
     
@@ -62,5 +62,5 @@ func main() {
       fmt.Fprintf(w, "POST send a message to the chatbot and get the response")
     })
 
-	  http.ListenAndServe(":8000", nil)
+	  http.ListenAndServe(":8080", nil)
 }
