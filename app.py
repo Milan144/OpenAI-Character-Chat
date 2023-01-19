@@ -4,26 +4,32 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 import os
+
+# Get the api key from the .env file
 api_key = os.getenv("API_KEY")
 
+# Home
 @app.route('/')
 def index():
     return 'Welcome to the Flask API'
 
+# ask something to openAI api
 @app.route('/api')
 def api():
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer' + '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'
+        'Authorization': f'Bearer {api_key}'
     }
     endpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions'
     payload = {
-        'prompt': 'What is the capital of France?',
+        'prompt': 'What is the name of the french president ?',
         'temperature': 0.5,
         'max_tokens': 100
     }
     response = requests.post(endpoint, json=payload, headers=headers)
-    return jsonify(response.json())
+    # Get the answer from the response
+    answer = response.json()
+    return jsonify(answer)
 
 
 if __name__ == '__main__':
