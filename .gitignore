@@ -1,2 +1,2 @@
-server.py/.env
-server.go/.env
+client/client/.env
+server/.env
