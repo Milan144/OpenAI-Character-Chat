@@ -9,7 +9,7 @@ else
 fi
 # Start Django app 
 cd ../client
-python3.9 manage.py runserver 127.0.0.1:5001 &
+python3.9 manage.py runserver 127.0.0.1:5002 &
 # Print if Django app is running or not
 if [ $? -eq 0 ]; then
     echo "🐍 Django app is running"
