@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
     // Load the .env file and get the API_KEY
     err := godotenv.Load()
     if err != nil {
@@ -18,6 +17,13 @@ func main() {
     apiKey := os.Getenv("API_KEY")
     println(apiKey)
 
+  // Connect to the mysql database using root : root
+    db, err := sql.Open("mysql", "root:root@localhost")
+    if err != nil {
+        panic(err.Error())
+    }
+    defer db.Close()
+  
     // --USER ROUTES-- //
  
     // GAMES ROUTES //
