@@ -8,20 +8,13 @@ import (
 	"net/http"
 	"os"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
-  "io/ioutil"
-  "bytes"
+  "github.com/solywsh/chatgpt"
+  "time"
+  "github.com/joho/godotenv"
 )
 
 func main() {
-    // Load the .env file and get the API_KEY
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
-    apiKey := os.Getenv("API_KEY")
-    println(apiKey)
-
+	 
     // Connect to phpmyadmin mysql database
     db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/open-character-chat");
 
@@ -59,7 +52,6 @@ func main() {
       id   int    `ID:"id"`
       content string `Content:"content"`
       datetime string `Date:"date"`
-      isSentByHuman bool `Is sent by human:"isSentByHuman"`
     }
     /*
     *   GameCharacter table
@@ -212,10 +204,16 @@ func main() {
 
     // POST add a new character 
     http.HandleFunc("/character/add/", func(w http.ResponseWriter, r *http.Request) {
-      name := r.URL.Query().Get("name")
-      personality := r.URL.Query().Get("personality")
+      name := r.URL.Query().Get("name") 
       game := r.URL.Query().Get("game")
-      // TODO: get personality parameter with a request to openAI api
+      gameName := db.QueryRow("SELECT title FROM Game WHERE id = ?", game)
+      var gameTitle string
+      err := gameName.Scan(&gameTitle)
+      if err != nil {
+          panic(err.Error())
+      }
+      log.Printf("GAME NAME : "+gameTitle)
+      personality := getInfos(name, gameTitle)
       log.Println("POST add a new game", name, personality, game)
       stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game) VALUES (?,?,?)")
       if err != nil {
@@ -225,7 +223,6 @@ func main() {
       if err != nil {
          panic(err.Error())
       }
-
       fmt.Println("Character added successfully")
     })
 
@@ -265,6 +262,7 @@ func main() {
 
     
     // CONVERSATIONS ROUTES //
+    // Get all conversations
     http.HandleFunc("/conversations", func(w http.ResponseWriter, r *http.Request) {
       log.Println("GET all conversations")
       results, err := db.Query("SELECT * FROM `conversations`")
@@ -283,35 +281,72 @@ func main() {
         defer results.Close()
     })
 
-    // --OPENAI ROUTES-- //
-    
-    // GET the infos about a character
-    http.HandleFunc("/openai/character", func(w http.ResponseWriter, r *http.Request) {
-      question := r.FormValue("question")
-      url := "https://api.openai.com/v1/engines/davinci/jobs"
-
-      payload := fmt.Sprintf(`{"prompt": "%s"}`, question)
-      req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(payload)))
-      req.Header.Add("Content-Type", "application/json")
-      req.Header.Add("Authorization", "Bearer <YOUR_API_KEY>")
-
-      res, _ := http.DefaultClient.Do(req)
-      if err != nil {
-        panic(err)
-      }
-      defer res.Body.Close()
-      body, _ := ioutil.ReadAll(res.Body)
-
-      fmt.Fprintln(w, string(body))
-    })
-
-    
     // POST send a message to the chatbot and get the response
-    http.HandleFunc("/openai/chatbot", func(w http.ResponseWriter, r *http.Request) {
+    http.HandleFunc("/openai/chatbot/", func(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "POST send a message to the chatbot and get the response")
+      
+      err := godotenv.Load()
+      if err != nil {
+        log.Fatal("Error loading .env file")
+      }
+      apiKey := os.Getenv("API_KEY")
+      
+      chat := chatgpt.New(apiKey, "1", 30*time.Second)
+      defer chat.Close()
+      
+      content := r.URL.Query().Get("content")
+      characterId := r.URL.Query().Get("character")
+      character := db.QueryRow("SELECT * FROM gameCharacter WHERE id = ?", characterId)
+      var id int
+      var name string
+      var personality string
+      var game string
+      err = character.Scan(&id, &name, &personality, &game)
+      if err != nil {
+          panic(err.Error())
+      }
+      log.Printf("CHARACTER ID : "+characterId)
+      log.Printf("CHARACTER NAME : "+name)
+      log.Printf("CHARACTER PERSONALITY : "+personality)
+      log.Printf("CHARACTER GAME : "+game)
+
+      question := "In a roleplay and fun context, talk to me like u are  " + name + " from the game " + game + " : " + personality
+	    answer, err := chat.ChatWithContext(question)
+	    if err != nil {
+		    fmt.Println(err)
+	    }
+	    fmt.Printf("A: %s\n", answer)
+	    fmt.Printf("Q: %s\n", content)
+	    answer, err = chat.ChatWithContext(content)
+	    if err != nil {
+		    fmt.Println(err)
+	    }
+	    fmt.Printf("A: %s\n", answer)
     })
 
 	  http.ListenAndServe(":8080", nil)
 
     defer db.Close()
 }
+
+
+// GET the infos about a character
+func getInfos(name string, game string) string {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+    apiKey := os.Getenv("API_KEY")
+    log.Printf(apiKey)
+    chat := chatgpt.New(apiKey, "1", 30*time.Second)
+    defer chat.Close()
+    log.Printf("API KEY : "+apiKey)
+    fmt.Println("GET the infos about a character")
+    // TODO : Reduce size of the personality text 
+    question := "Resume me the story of "+name+" from "+game+"in less than 100 words" 
+    answer, err := chat.Chat(question)
+	  if err != nil {
+		  fmt.Println(err)
+	  }
+    return answer
+};

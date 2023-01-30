@@ -2,13 +2,12 @@
 Talk with a video game character using OpenAI API
 
 ## Techs
-This app is using Django for client-side interface and GO for the API
+This app is using GO for the server-side
 
 ## Requirements
-You must install Python (>3.6) and Go. Make sure pip is installed by typing pip --version.
-
+You must install Go. Make sure go is installed by typing 'go version'. (On MacOS go is already added in path but on other OS you may need to add it yourself).
 ## Installation 
-Launch the installation script, it will install the dependencies for Django and Go apps.
+Launch the installation script, it will install the dependencies for the GO server.
 
 ## Database
 Import the characterChatAI.sql file into msql.
