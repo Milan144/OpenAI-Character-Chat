@@ -1,7 +1,7 @@
 # OpenAI-Character-Chat
 Talk with a video game character using OpenAI API
 
-## Techs
+## Tech
 This app is using Django for client-side interface and GO for the API
 
 ## Requirements
