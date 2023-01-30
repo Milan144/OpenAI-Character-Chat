@@ -9,6 +9,8 @@ import (
 	"os"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+  "io/ioutil"
+  "bytes"
 )
 
 func main() {
@@ -92,21 +94,16 @@ func main() {
         var game Game
         err = results.Scan(&game.id, &game.title, &game.releaseDate, &game.isMultiplayer)
         if err != nil {
-            panic(err.Error()) // proper error handling instead of panic in your app
+            panic(err.Error())
         }
-        // Format result to display it on page
         fmt.Fprintf(w, "ID: %d, Title: %s, Release date: %s, Is multiplayer: %t \n", game.id, game.title, game.releaseDate, game.isMultiplayer)
-
       } 
-
       defer results.Close()
     })
 
-    // GET a game by id 
     http.HandleFunc("/game/", func(w http.ResponseWriter, r *http.Request) {
       id := r.URL.Query().Get("id")
       log.Println("GET a game by id", id)
-      // Get the id from the url
       results, err := db.Query("SELECT * FROM `Game` WHERE id = ?", id)
       if err !=nil {
           panic(err.Error())
@@ -115,28 +112,19 @@ func main() {
         var game Game
         err = results.Scan(&game.id, &game.title, &game.releaseDate, &game.isMultiplayer)
         if err != nil {
-            panic(err.Error()) // proper error handling instead of panic in your app
+            panic(err.Error()) 
         }
         fmt.Fprintf(w, "ID: %d, Title: %s, Release date: %s, Is multiplayer: %t \n", game.id, game.title, game.releaseDate, game.isMultiplayer)
-
-
       }
       defer results.Close()
     })
 
     // POST add a new game
     http.HandleFunc("/game/add/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
       title := r.URL.Query().Get("title")
       releaseDate := r.URL.Query().Get("releaseDate")
       isMultiplayer := r.URL.Query().Get("isMultiplayer")
-      
       log.Println("POST add a new game", title, releaseDate, isMultiplayer)
-
-      // Example url
-      // http://localhost:8080/game/add/?title=Call of Duty Modern Warfare 2&releaseDate=01-10-2022&isMultiplayer=1
-
-      // Inserting data 
       stmt, err := db.Prepare("INSERT INTO Game (title, releaseDate, isMultiplayer) VALUES (?,?,?)")
       if err != nil {
           panic(err.Error())
@@ -146,24 +134,16 @@ func main() {
       if err != nil {
          panic(err.Error())
       }
-
       fmt.Println("Game added successfully")
     })
 
     // PUT update a game
     http.HandleFunc("/game/update/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
       id := r.URL.Query().Get("id")
       title := r.URL.Query().Get("title")
       releaseDate := r.URL.Query().Get("releaseDate")
       isMultiplayer := r.URL.Query().Get("isMultiplayer")
-
       log.Println("PUT update a game", id, title, releaseDate, isMultiplayer)
-
-      // Example url
-      // http://localhost:8080/game/update/?id=1&title=Call of Duty Modern Warfare 2&releaseDate=01-10-2022&isMultiplayer=1
-
-      // Updating data
       stmt, err := db.Prepare("UPDATE Game SET title = ?, releaseDate = ?, isMultiplayer = ? WHERE id = ?")
       if err != nil {
           panic(err.Error())
@@ -179,15 +159,8 @@ func main() {
 
     // DELETE a game
     http.HandleFunc("/game/delete/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
       id := r.URL.Query().Get("id")
-
       log.Println("DELETE a game", id)
-
-      // Example url
-      // http://localhost:8080/game/delete/?id=1
-
-      // Deleting data
       stmt, err := db.Prepare("DELETE FROM Game WHERE id = ?")
       if err != nil {
           panic(err.Error())
@@ -197,7 +170,6 @@ func main() {
       if err != nil {
           panic(err.Error())
       }
-
       fmt.Println("Game deleted successfully")
     })
 
@@ -218,14 +190,11 @@ func main() {
         }
         fmt.Fprintf(w, "ID: %d, Name: %s, Personality: %s, Game: %d \n", character.id, character.name, character.personality, character.game)
       } 
-
       defer results.Close()
     })
-    // GET a character by id 
     http.HandleFunc("/character/", func(w http.ResponseWriter, r *http.Request) {
       id := r.URL.Query().Get("id")
       log.Println("GET a character by id", id)
-      // Get the id from the url
       results, err := db.Query("SELECT * FROM `gameCharacter` WHERE id = ?", id)
       if err !=nil {
           panic(err.Error())
@@ -243,21 +212,11 @@ func main() {
 
     // POST add a new character 
     http.HandleFunc("/character/add/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
-      // TODO : Change request
       name := r.URL.Query().Get("name")
       personality := r.URL.Query().Get("personality")
       game := r.URL.Query().Get("game")
-
-
       // TODO: get personality parameter with a request to openAI api
-
       log.Println("POST add a new game", name, personality, game)
-
-      // Example url
-      // http://localhost:8080/game/add/?title=Call of Duty Modern Warfare 2&releaseDate=01-10-2022&isMultiplayer=1
-
-      // Inserting data 
       stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game) VALUES (?,?,?)")
       if err != nil {
           panic(err.Error())
@@ -272,18 +231,11 @@ func main() {
 
     // PUT update a character
     http.HandleFunc("/character/update/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
       id := r.URL.Query().Get("id")
       name := r.URL.Query().Get("name")
       personality := r.URL.Query().Get("personality")
       game := r.URL.Query().Get("game")
-
       log.Println("PUT update a character", id, name, personality, game)
-
-      // Example url
-      // http://localhost:8080/game/update/?id=1&title=Call of Duty Modern Warfare 2&releaseDate=01-10-2022&isMultiplayer=1
-
-      // Updating data
       stmt, err := db.Prepare("UPDATE gameCharacter SET name = ?, personality = ?, game = ? WHERE id = ?")
       if err != nil {
           panic(err.Error())
@@ -292,18 +244,13 @@ func main() {
       if err != nil {
           panic(err.Error())
       }
-
       fmt.Println("Character updated successfully")
     })
 
     // Delete a character
     http.HandleFunc("/character/delete/", func(w http.ResponseWriter, r *http.Request) {
-      // Getting parameters
       id := r.URL.Query().Get("id")
-      
       log.Println("DELETE a character", id)
-      
-      // Deleting data
       stmt, err := db.Prepare("DELETE FROM gameCharacter WHERE id = ?")
       if err != nil {
           panic(err.Error())
@@ -328,7 +275,7 @@ func main() {
           var conversation Conversation
           err = results.Scan(&conversation.id, &conversation.userId, &conversation.characterId, &conversation.isOpen, &conversation.lastMsgDate)
           if err != nil {
-              panic(err.Error()) // proper error handling instead of panic in your app
+              panic(err.Error()) 
           }
           fmt.Fprintf(io.Writer(w), conversation.lastMsgDate)
         } 
@@ -340,8 +287,24 @@ func main() {
     
     // GET the infos about a character
     http.HandleFunc("/openai/character", func(w http.ResponseWriter, r *http.Request) {
-      fmt.Fprintf(w, "GET the infos about a character with his game and name")
+      question := r.FormValue("question")
+      url := "https://api.openai.com/v1/engines/davinci/jobs"
+
+      payload := fmt.Sprintf(`{"prompt": "%s"}`, question)
+      req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(payload)))
+      req.Header.Add("Content-Type", "application/json")
+      req.Header.Add("Authorization", "Bearer <YOUR_API_KEY>")
+
+      res, _ := http.DefaultClient.Do(req)
+      if err != nil {
+        panic(err)
+      }
+      defer res.Body.Close()
+      body, _ := ioutil.ReadAll(res.Body)
+
+      fmt.Fprintln(w, string(body))
     })
+
     
     // POST send a message to the chatbot and get the response
     http.HandleFunc("/openai/chatbot", func(w http.ResponseWriter, r *http.Request) {
