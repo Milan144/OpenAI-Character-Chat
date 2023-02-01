@@ -305,11 +305,6 @@ func main() {
       if err != nil {
           panic(err.Error())
       }
-      log.Printf("CHARACTER ID : "+characterId)
-      log.Printf("CHARACTER NAME : "+name)
-      log.Printf("CHARACTER PERSONALITY : "+personality)
-      log.Printf("CHARACTER GAME : "+game)
-
       question := "In a roleplay and fun context, talk to me like u are  " + name + " from the game " + game + " : " + personality
 	    answer, err := chat.ChatWithContext(question)
 	    if err != nil {
@@ -342,7 +337,6 @@ func getInfos(name string, game string) string {
     defer chat.Close()
     log.Printf("API KEY : "+apiKey)
     fmt.Println("GET the infos about a character")
-    // TODO : Reduce size of the personality text 
     question := "Resume me the story of "+name+" from "+game+"in less than 100 words" 
     answer, err := chat.Chat(question)
 	  if err != nil {
