@@ -305,7 +305,8 @@ func main() {
       if err != nil {
           panic(err.Error())
       }
-      question := "In a roleplay and fun context, talk to me like u are  " + name + " from the game " + game + " : " + personality
+      log.Printf("CONTENT :" + content + "CHARACTER : "+name + personality)
+      question := "In a roleplay and fun context, talk to me in english like u are  " + name + " from the game " + game + " : " + personality
 	    answer, err := chat.ChatWithContext(question)
 	    if err != nil {
 		    fmt.Println(err)
