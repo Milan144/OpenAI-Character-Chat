@@ -81,6 +81,7 @@ func main() {
 	// GET ALL games
 	http.HandleFunc("/games", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("GET all games")
+		//getImage("Gangplank", "League of Legends")
 		results, err := db.Query("SELECT * FROM `Game`")
 		if err != nil {
 			panic(err.Error())
@@ -212,14 +213,19 @@ func main() {
 	http.HandleFunc("/character/add/", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
 		game := r.URL.Query().Get("game")
+
 		gameName := db.QueryRow("SELECT title FROM Game WHERE id = ?", game)
 		var gameTitle string
 		err := gameName.Scan(&gameTitle)
 		if err != nil {
 			panic(err.Error())
 		}
+
 		personality := getInfos(name, gameTitle)
-		stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game) VALUES (?,?,?)")
+
+		//image := getImage(name, gameTitle)
+
+		stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game, image) VALUES (?,?,?,?)")
 		if err != nil {
 			panic(err.Error())
 		}
@@ -333,8 +339,8 @@ func main() {
 		fmt.Fprintf(w, answer)
 	})
 
-	fmt.Println("Server running on port 8080")
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Server running on port 8000")
+	http.ListenAndServe(":8000", nil)
 
 	defer db.Close()
 }
@@ -350,7 +356,7 @@ func getInfos(name string, game string) string {
 	// Get api key from .env file
 	apiKey := os.Getenv("API_KEY")
 
-	engineID := "text-davinci-001"
+	engineID := "text-ada-003"
 	url := fmt.Sprintf("https://api.openai.com/v1/engines/%s/completions", engineID)
 
 	question := "Resume me the story of " + name + " from " + game + "in 100 words"
@@ -369,7 +375,7 @@ func getInfos(name string, game string) string {
 	resp, _ := client.Do(req)
 
 	var responseData OpenAIResponse
-	
+
 	json.NewDecoder(resp.Body).Decode(&responseData)
 
 	answer := responseData.Choices[0].Text

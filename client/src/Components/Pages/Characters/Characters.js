@@ -7,7 +7,7 @@ export default function Characters(props) {
 
     const [characters, setCharacters] = useState([]);
     const getAllCharacters = () => {
-        axios.get(`http://localhost:8080/characters`)
+        axios.get(`http://localhost:8000/characters`)
             .then((response) => {
                 const allCharacters = response.data;
                 const charactersArray = allCharacters.split('\n').map(game => {

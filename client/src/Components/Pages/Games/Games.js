@@ -7,7 +7,7 @@ export default function Games(props) {
 
     const [games, setGames] = useState([]);
     const getAllGames = () => {
-        axios.get(`http://localhost:8080/games`)
+        axios.get(`http://localhost:8000/games`)
             .then((response) => {
                 const allGames = response.data;
                 const gamesArray = allGames.split('\n').map(game => {
