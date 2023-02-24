@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -64,6 +65,7 @@ func main() {
 		name        string `Name:"name"`
 		personality string `Personality:"personality"`
 		game        int    `Game:"game"`
+		image       string `Image:"image"`
 	}
 	/*
 	 *   Conversations table
@@ -80,8 +82,8 @@ func main() {
 
 	// GET ALL games
 	http.HandleFunc("/games", func(w http.ResponseWriter, r *http.Request) {
+		getImage("Gangplank", "League of Legends")
 		log.Println("GET all games")
-		//getImage("Gangplank", "League of Legends")
 		results, err := db.Query("SELECT * FROM `Game`")
 		if err != nil {
 			panic(err.Error())
@@ -181,7 +183,7 @@ func main() {
 		}
 		for results.Next() {
 			var character gameCharacter
-			err = results.Scan(&character.id, &character.name, &character.personality, &character.game)
+			err = results.Scan(&character.id, &character.name, &character.personality, &character.game, &character.image)
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
@@ -222,10 +224,10 @@ func main() {
 		}
 
 		personality := getInfos(name, gameTitle)
-
 		//image := getImage(name, gameTitle)
-
-		stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game, image) VALUES (?,?,?,?)")
+		fmt.Println("Getting image for " + name + " from " + gameTitle)
+		//image := getImage(name, gameTitle)
+		stmt, err := db.Prepare("INSERT INTO gameCharacter (name, personality, game) VALUES (?,?,?)")
 		if err != nil {
 			panic(err.Error())
 		}
@@ -347,7 +349,6 @@ func main() {
 
 // GET the infos about a character
 func getInfos(name string, game string) string {
-
 	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
@@ -380,4 +381,50 @@ func getInfos(name string, game string) string {
 
 	answer := responseData.Choices[0].Text
 	return answer
+}
+
+func getImage(name string, game string) string {
+	println("Get image for " + name + " from " + game)
+	url := "https://api.openai.com/v1/images/generations"
+
+	// Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	// Get api key from .env file
+	apiKey := os.Getenv("API_KEY")
+
+	// create JSON payload
+	jsonData := []byte(`{
+        "prompt": " ` + name + ` from ` + game + ` with a synthwave style",
+        "n": 1,
+        "size": "1024x1024"
+    }`)
+
+	// create request object with headers and payload
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	// send HTTP request and get response
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// read response body
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// print response body
+	fmt.Println(string(body))
+	return string(body)
 }
