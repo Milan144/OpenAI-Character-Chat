@@ -1,0 +1,324 @@
+{
+	"info": {
+		"_postman_id": "5164ea09-dfab-482f-a2c7-297691e88381",
+		"name": "OpenAI-Character-Chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18517836"
+	},
+	"item": [
+		{
+			"name": "Characters",
+			"item": [
+				{
+					"name": "Get all characters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}characters",
+							"host": [
+								"{{URL}}characters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a character",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}character/add/?name=Pyke&game=1",
+							"host": [
+								"{{URL}}character"
+							],
+							"path": [
+								"add",
+								""
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Pyke"
+								},
+								{
+									"key": "game",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a character",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}character/update/?name=Gangplank&personality=A pirate from the game League of Legends&game=1",
+							"host": [
+								"{{URL}}character"
+							],
+							"path": [
+								"update",
+								""
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Gangplank"
+								},
+								{
+									"key": "personality",
+									"value": "A pirate from the game League of Legends"
+								},
+								{
+									"key": "game",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a character by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}character/?id=1",
+							"host": [
+								"{{URL}}character"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Games",
+			"item": [
+				{
+					"name": "Add a game",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "test",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "releaseDate",
+									"value": "01-10-2022",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "isMultiplayer",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}game/add/?title=League of Legends&releaseDate=27-10-2009&isMultiplayer=1",
+							"host": [
+								"{{URL}}game"
+							],
+							"path": [
+								"add",
+								""
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "League of Legends"
+								},
+								{
+									"key": "releaseDate",
+									"value": "27-10-2009"
+								},
+								{
+									"key": "isMultiplayer",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a game",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "test",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "releaseDate",
+									"value": "01-10-2022",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "isMultiplayer",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}game/add/?title=League of Legends&releaseDate=27-10-2009&isMultiplayer=1",
+							"host": [
+								"{{URL}}game"
+							],
+							"path": [
+								"add",
+								""
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "League of Legends"
+								},
+								{
+									"key": "releaseDate",
+									"value": "27-10-2009"
+								},
+								{
+									"key": "isMultiplayer",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all games",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}games",
+							"host": [
+								"{{URL}}games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a game by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}game/?id=1",
+							"host": [
+								"{{URL}}game"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OpenAI",
+			"item": [
+				{
+					"name": "Chatbot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}openai/chatbot/?content=Who are you&character=7",
+							"host": [
+								"{{URL}}openai"
+							],
+							"path": [
+								"chatbot",
+								""
+							],
+							"query": [
+								{
+									"key": "content",
+									"value": "Who are you"
+								},
+								{
+									"key": "character",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:8000/",
+			"type": "string"
+		}
+	]
+}
